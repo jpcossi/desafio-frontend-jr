@@ -29,8 +29,12 @@ horarios.forEach((horario) => {
   let tr = document.createElement("tr");
 
   let tdHorario = document.createElement("td");
+  let borderTop = document.createElement("div");
   tdHorario.textContent = horario;
   tdHorario.classList.add("horario");
+  borderTop.classList.add("border-top");
+
+  tdHorario.appendChild(borderTop);
   tr.appendChild(tdHorario);
 
   for (let i = 0; i < 7; i++) {
@@ -45,13 +49,37 @@ horarios.forEach((horario) => {
 });
 
 const eventos = [
-  { dia: 1, inicio: "10 AM", fim: "1 PM", titulo: "Reunião A" },
-  { dia: 1, inicio: "12 PM", fim: "2 PM", titulo: "Reunião B" },
-  { dia: 3, inicio: "2 PM", fim: "5 PM", titulo: "Workshop" },
-  { dia: 3, inicio: "2 PM", fim: "5 PM", titulo: "Mentoria" },
-  { dia: 5, inicio: "9 AM", fim: "11 AM", titulo: "Apresentação" },
-  { dia: 5, inicio: "9 AM", fim: "11 AM", titulo: "Treinamento" },
-  { dia: 5, inicio: "9 AM", fim: "10 AM", titulo: "Call" },
+  {
+    dia: 1,
+    inicio: "10 AM",
+    fim: "1 PM",
+    titulo: "Reunião A",
+    color: "#FF5733",
+  },
+  {
+    dia: 1,
+    inicio: "12 PM",
+    fim: "2 PM",
+    titulo: "Reunião B",
+    color: "#33B5FF",
+  },
+  { dia: 3, inicio: "2 PM", fim: "5 PM", titulo: "Workshop", color: "#FFC300" },
+  { dia: 3, inicio: "2 PM", fim: "5 PM", titulo: "Mentoria", color: "#28A745" },
+  {
+    dia: 5,
+    inicio: "9 AM",
+    fim: "11 AM",
+    titulo: "Apresentação",
+    color: "#9B59B6",
+  },
+  {
+    dia: 5,
+    inicio: "9 AM",
+    fim: "11 AM",
+    titulo: "Treinamento",
+    color: "#FF6F61",
+  },
+  { dia: 5, inicio: "9 AM", fim: "10 AM", titulo: "Call", color: "#3498DB" },
 ];
 
 function getHoraIndex(hora) {
@@ -74,8 +102,6 @@ eventos.forEach((evento) => {
 
 Object.keys(eventosAgrupados).forEach((dia) => {
   let eventosDoDia = eventosAgrupados[dia];
-  console.log("eventos", eventosDoDia);
-  let colunas = [];
 
   for (let i = 0; i < eventosDoDia.length; i++) {
     let primeiraCelula = document.querySelector(
@@ -90,14 +116,21 @@ Object.keys(eventosAgrupados).forEach((dia) => {
 
       let duracao = eventosDoDia[i].fimIndex - eventosDoDia[i].inicioIndex + 1;
 
-      let larguraPorEvento = 100 / eventosDoDia.length;
-      console.log(larguraPorEvento);
-      let left = larguraPorEvento * i;
+      let totalEventos = eventosDoDia.length;
+      let espacoTotal = 10;
+      let espacoEntreEventos = 5;
+      let larguraDisponivel = 100 - espacoTotal;
+      let larguraPorEvento =
+        (larguraDisponivel - espacoEntreEventos * (totalEventos - 1)) /
+        totalEventos;
+
+      let left = 5 + i * (larguraPorEvento + espacoEntreEventos);
 
       divEvento.style.height = `${duracao * 50}px`;
       divEvento.style.width = `${larguraPorEvento}%`;
       divEvento.style.left = `${left}%`;
       divEvento.style.top = "0";
+      divEvento.style.backgroundColor = `${eventosDoDia[i].color}`;
 
       primeiraCelula.appendChild(divEvento);
     }

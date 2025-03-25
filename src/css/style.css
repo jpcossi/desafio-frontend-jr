@@ -1,14 +1,25 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
 header {
+  width: 100vw;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
 
-  height: 100px;
+  height: 128px;
+  padding: 40px 48px;
+  box-sizing: border-box;
 
   h1 {
-    font-size: 32px;
+    display: inline-block;
+    font-size: 40px;
+    font-weight: 700;
   }
 
   .slideDay {
@@ -35,7 +46,6 @@ header {
 
       font-size: 24px;
       font-weight: 500;
-      font-family: "Inter", sans-serif;
       color: #3d3d3d;
 
       border-radius: 8px;
@@ -45,31 +55,80 @@ header {
 }
 
 table {
-  width: 100%;
+  width: 100vw;
   border-collapse: collapse;
 }
 th,
 td {
-  border: 1px solid #ccc;
+  border: #f2f2f7 3px solid;
   width: 173px;
   height: 50px;
   position: relative;
 }
-.horario {
-  width: 8%;
-  text-align: center;
-  font-weight: bold;
-  background: #eee;
+
+.dia {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 48px;
+
+  p {
+    font-weight: 500;
+    font-size: 20px;
+  }
+
+  h1 {
+    font-weight: 600;
+    font-size: 32px;
+  }
+
+  h2 {
+    font-weight: 400;
+    font-size: 20px;
+    opacity: 35%;
+  }
 }
+.horario {
+  width: 133px;
+  text-align: right;
+  padding-right: 25px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #8e8e93;
+  top: -24px;
+  border: none;
+}
+
+thead > tr > th.horario {
+  border-top: #f2f2f7 3px solid;
+}
+
+tbody > tr > td.horario::before {
+  content: "";
+  position: absolute;
+  top: 22.5px;
+  right: 0;
+  width: 12%;
+  height: 3px;
+  background-color: #f2f2f7;
+}
+
 .evento {
   position: absolute;
-  background: #ffcc00;
   opacity: 0.32;
-  text-align: left;
-  font-size: 12px;
+
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  color: #3d3d3d;
+  font-size: 16px;
+  font-weight: 500;
+
   display: flex;
-  justify-content: center;
-  border-radius: 5px;
+  flex-direction: column;
+  padding: 8px;
+  border-radius: 8px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  padding: 0px;
 }
