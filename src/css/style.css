@@ -62,7 +62,7 @@ th,
 td {
   border: #f2f2f7 3px solid;
   width: 173px;
-  height: 50px;
+  height: 64px;
   position: relative;
 }
 
@@ -93,11 +93,11 @@ td {
 .horario {
   width: 133px;
   text-align: right;
-  padding-right: 25px;
+  padding-right: 28px;
   font-weight: 500;
   font-size: 16px;
   color: #8e8e93;
-  top: -24px;
+  top: -25px;
   border: none;
 }
 
@@ -108,7 +108,7 @@ thead > tr > th.horario {
 tbody > tr > td.horario::before {
   content: "";
   position: absolute;
-  top: 22.5px;
+  top: 23.5px;
   right: 0;
   width: 12%;
   height: 3px;
