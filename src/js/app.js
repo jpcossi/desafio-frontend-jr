@@ -25,8 +25,9 @@ const horarios = [
   "10 PM",
   "11 PM",
 ];
-
 const eventos = await dataJSON();
+
+let eventosAgrupados = {};
 
 let currentWeekStartDate = new Date();
 const startOfWeek = new Date(currentWeekStartDate);
@@ -53,6 +54,7 @@ horarios.forEach((horario) => {
 
   let tdHorario = document.createElement("td");
   let borderTop = document.createElement("div");
+
   tdHorario.textContent = horario;
   tdHorario.classList.add("horario");
   borderTop.classList.add("border-top");
@@ -123,12 +125,14 @@ function updateWeekDates() {
 document.getElementById("next-week").addEventListener("click", () => {
   currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
   updateWeekDates();
+  destacarDiaAtual();
   marcarEventos();
 });
 
 document.getElementById("previous-week").addEventListener("click", () => {
   currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
   updateWeekDates();
+  destacarDiaAtual();
   marcarEventos();
 });
 
@@ -159,7 +163,23 @@ function separarDiaHora(dataInicio, dataFim) {
   };
 }
 
-let eventosAgrupados = {};
+const timeBar = document.createElement("div");
+timeBar.classList.add("linha-horario");
+document.body.appendChild(timeBar);
+
+function updateTimeBar() {
+  const hour = converterHora(
+    startOfWeek.getHours() + ":" + startOfWeek.getMinutes()
+  );
+  const minutes = startOfWeek.getMinutes();
+  let startCell = document.querySelector(`td[data-hora="${hour}"]`);
+
+  if (startCell) {
+    let cellPosition = startCell.getBoundingClientRect();
+    let topBar = cellPosition.top + (minutes / 60) * cellPosition.height;
+    timeBar.style.top = `${topBar}px`;
+  }
+}
 
 function marcarEventos() {
   document.querySelectorAll(".evento").forEach((evento) => evento.remove());
@@ -262,5 +282,22 @@ function marcarEventos() {
   });
 }
 
+function destacarDiaAtual() {
+  const currentDay = new Date().getDate();
+
+  document.querySelectorAll("th").forEach((th) => {
+    th.classList.remove("dia-atual");
+  });
+
+  document.querySelectorAll("th .dia h1").forEach((h1) => {
+    if (parseInt(h1.textContent, 10) === currentDay) {
+      h1.parentElement.parentElement.classList.add("dia-atual");
+    }
+  });
+}
+
 updateWeekDates();
 marcarEventos();
+updateTimeBar();
+destacarDiaAtual();
+//setInterval(updateTimeBar(), 60000);

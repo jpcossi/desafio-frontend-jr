@@ -35,6 +35,11 @@ header {
       height: 64px;
       width: 64px;
       background-color: #f2f2f7;
+      transition: background-color 0.5s;
+    }
+
+    button:hover {
+      background-color: #bdbbbb;
     }
 
     p {
@@ -97,7 +102,7 @@ td {
   font-weight: 500;
   font-size: 16px;
   color: #8e8e93;
-  top: -25px;
+  top: -31px;
   border: none;
 }
 
@@ -108,7 +113,7 @@ thead > tr > th.horario {
 tbody > tr > td.horario::before {
   content: "";
   position: absolute;
-  top: 23.5px;
+  top: 29.5px;
   right: 0;
   width: 12%;
   height: 3px;
@@ -131,4 +136,23 @@ tbody > tr > td.horario::before {
   padding: 8px;
   border-radius: 8px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.6s;
+}
+
+.evento:hover {
+  opacity: 0.8;
+}
+
+.linha-horario {
+  position: absolute;
+  height: 2px;
+  background-color: #5856d6;
+  z-index: 1000;
+  left: 120px;
+  width: 93%;
+  pointer-events: none;
+}
+
+.dia-atual {
+  color: #5856d6;
 }
