@@ -1,3 +1,5 @@
+import hexToRgba from "../utils/hexToRgba.js";
+
 const agendaBody = document.getElementById("agenda-body");
 const horarios = [
   "12 AM",
@@ -163,9 +165,10 @@ function separarDiaHora(dataInicio, dataFim) {
   };
 }
 
+const table = document.querySelector("table");
 const timeBar = document.createElement("div");
 timeBar.classList.add("linha-horario");
-document.body.appendChild(timeBar);
+table.appendChild(timeBar);
 
 function updateTimeBar() {
   const hour = converterHora(
@@ -176,10 +179,14 @@ function updateTimeBar() {
 
   if (startCell) {
     let cellPosition = startCell.getBoundingClientRect();
-    let topBar = cellPosition.top + (minutes / 60) * cellPosition.height;
-    timeBar.style.top = `${topBar}px`;
+    console.log(cellPosition);
+    let topBar = cellPosition.top + (minutes / 60) * cellPosition.height - 128;
+    timeBar.style.top = `${topBar + window.scrollY}px`;
+    timeBar.style.left = `${cellPosition.left - 17}px`;
   }
 }
+
+window.addEventListener("resize", updateTimeBar);
 
 function marcarEventos() {
   document.querySelectorAll(".evento").forEach((evento) => evento.remove());
@@ -253,7 +260,9 @@ function marcarEventos() {
 
       if (primeiraCelula) {
         let divEvento = document.createElement("div");
-        divEvento.textContent = eventosDoDia[i].nome;
+        let textElement = document.createElement("p");
+        divEvento.appendChild(textElement);
+        textElement.textContent = eventosDoDia[i].nome;
         divEvento.classList.add("evento");
 
         let duracao =
@@ -274,7 +283,14 @@ function marcarEventos() {
         divEvento.style.width = `${larguraPorEvento}%`;
         divEvento.style.left = `${left}%`;
         divEvento.style.top = "0";
-        divEvento.style.backgroundColor = `${eventosDoDia[i].cor}`;
+        divEvento.style.backgroundColor = hexToRgba(eventosDoDia[i].cor);
+
+        divEvento.addEventListener("mouseenter", () => {
+          divEvento.style.backgroundColor = hexToRgba(eventosDoDia[i].cor, 1);
+        });
+        divEvento.addEventListener("mouseleave", () => {
+          divEvento.style.backgroundColor = hexToRgba(eventosDoDia[i].cor);
+        });
 
         primeiraCelula.appendChild(divEvento);
       }
