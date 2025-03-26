@@ -124,18 +124,52 @@ function updateWeekDates() {
   });
 }
 
+const agendaTable = document.getElementById("agenda-table");
+
 document.getElementById("next-week").addEventListener("click", () => {
-  currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
-  updateWeekDates();
-  destacarDiaAtual();
-  marcarEventos();
+  document.getElementById("next-week").disabled = true;
+
+  table.classList.remove("table-right");
+  table.classList.add("table-left");
+
+  setTimeout(() => {
+    currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
+
+    destacarDiaAtual();
+    updateWeekDates();
+    marcarEventos();
+
+    table.classList.remove("table-left");
+    table.classList.add("table-right");
+  }, 400);
+
+  setTimeout(() => {
+    table.classList.remove("table-right");
+    document.getElementById("next-week").disabled = false;
+  }, 550);
 });
 
 document.getElementById("previous-week").addEventListener("click", () => {
-  currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
-  updateWeekDates();
-  destacarDiaAtual();
-  marcarEventos();
+  document.getElementById("previous-week").disabled = true;
+
+  table.classList.remove("table-left");
+  table.classList.add("table-right");
+
+  setTimeout(() => {
+    currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
+
+    destacarDiaAtual();
+    updateWeekDates();
+    marcarEventos();
+
+    table.classList.remove("table-right");
+    table.classList.add("table-left");
+  }, 400);
+
+  setTimeout(() => {
+    table.classList.remove("table-left");
+    document.getElementById("previous-week").disabled = false;
+  }, 550);
 });
 
 function getHoraIndex(hora) {
