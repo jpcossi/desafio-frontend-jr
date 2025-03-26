@@ -25,6 +25,15 @@ const horarios = [
   "10 PM",
   "11 PM",
 ];
+
+const eventos = await dataJSON();
+
+let currentWeekStartDate = new Date();
+const startOfWeek = new Date(currentWeekStartDate);
+startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+const endOfWeek = new Date(startOfWeek);
+endOfWeek.setDate(endOfWeek.getDate() + 6);
+
 async function dataJSON() {
   try {
     const response = await fetch("../../eventos.json");
@@ -50,8 +59,7 @@ horarios.forEach((horario) => {
 
   tdHorario.appendChild(borderTop);
   tr.appendChild(tdHorario);
-
-  for (let i = 0; i < 7; i++) {
+  for (let i = startOfWeek.getDate(); i <= endOfWeek.getDate(); i++) {
     let td = document.createElement("td");
     td.setAttribute("data-hora", horario);
     td.setAttribute("data-dia", i);
@@ -61,8 +69,6 @@ horarios.forEach((horario) => {
 
   agendaBody.appendChild(tr);
 });
-
-let currentWeekStartDate = new Date();
 
 function updateWeekDates() {
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -81,7 +87,6 @@ function updateWeekDates() {
     const monthElement = document.getElementById(`dia${i + 1}-p`);
 
     dayElement.textContent = currentDay.getDate();
-
     weekdayElement.textContent = daysOfWeek[i];
 
     const monthNames = [
@@ -100,59 +105,37 @@ function updateWeekDates() {
     ];
     monthElement.textContent = monthNames[currentDay.getMonth()];
   }
-}
 
-updateWeekDates();
+  const rows = document.querySelectorAll("#agenda-body tr");
+
+  rows.forEach((row) => {
+    const cells = row.querySelectorAll("td[data-hora]");
+
+    cells.forEach((cell, index) => {
+      const cellDate = new Date(startOfWeek);
+      cellDate.setDate(startOfWeek.getDate() + index);
+
+      cell.setAttribute("data-dia", cellDate.getDate());
+    });
+  });
+}
 
 document.getElementById("next-week").addEventListener("click", () => {
   currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
   updateWeekDates();
+  marcarEventos();
 });
 
 document.getElementById("previous-week").addEventListener("click", () => {
   currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
   updateWeekDates();
+  marcarEventos();
 });
-
-const eventos = [
-  {
-    dia: 1,
-    inicio: "10 AM",
-    fim: "1 PM",
-    titulo: "Reunião A",
-    color: "#FF5733",
-  },
-  {
-    dia: 1,
-    inicio: "12 PM",
-    fim: "2 PM",
-    titulo: "Reunião B",
-    color: "#33B5FF",
-  },
-  { dia: 3, inicio: "2 PM", fim: "5 PM", titulo: "Workshop", color: "#FFC300" },
-  { dia: 3, inicio: "2 PM", fim: "5 PM", titulo: "Mentoria", color: "#28A745" },
-  {
-    dia: 5,
-    inicio: "9 AM",
-    fim: "11 AM",
-    titulo: "Apresentação",
-    color: "#9B59B6",
-  },
-  {
-    dia: 5,
-    inicio: "9 AM",
-    fim: "11 AM",
-    titulo: "Treinamento",
-    color: "#FF6F61",
-  },
-  { dia: 5, inicio: "9 AM", fim: "10 AM", titulo: "Call", color: "#3498DB" },
-];
-
-const eventos2 = await dataJSON();
 
 function getHoraIndex(hora) {
   return horarios.indexOf(hora);
 }
+
 function converterHora(time) {
   const [hora, minutos] = time.split(":").map(Number);
   const periodo = hora >= 12 ? "PM" : "AM";
@@ -178,53 +161,106 @@ function separarDiaHora(dataInicio, dataFim) {
 
 let eventosAgrupados = {};
 
-eventos2.forEach((evento) => {
-  const eventoData = separarDiaHora(evento.data_inicio, evento.data_fim);
-  let inicioIndex = getHoraIndex(eventoData.inicioEvento);
-  let fimIndex = getHoraIndex(eventoData.fimEvento);
-  let chave = `${eventoData.dataInicioDia}`;
+function marcarEventos() {
+  document.querySelectorAll(".evento").forEach((evento) => evento.remove());
 
-  if (!eventosAgrupados[chave]) {
-    eventosAgrupados[chave] = [];
-  }
+  eventosAgrupados = {};
+  eventos.forEach((evento) => {
+    const eventoData = separarDiaHora(evento.data_inicio, evento.data_fim);
 
-  eventosAgrupados[chave].push({ ...evento, inicioIndex, fimIndex });
-});
+    const startOfWeek = new Date(currentWeekStartDate);
+    const dayOfWeek = startOfWeek.getDay();
+    startOfWeek.setDate(currentWeekStartDate.getDate() - dayOfWeek);
 
-Object.keys(eventosAgrupados).forEach((dia) => {
-  let eventosDoDia = eventosAgrupados[dia];
+    const weekEndDate = new Date(startOfWeek);
+    weekEndDate.setDate(startOfWeek.getDate() + 6);
 
-  for (let i = 0; i < eventosDoDia.length; i++) {
-    let primeiraCelula = document.querySelector(
-      `td[data-hora="${
-        horarios[eventosDoDia[i].inicioIndex]
-      }"][data-dia="${dia}"]`
-    );
-    if (primeiraCelula) {
-      let divEvento = document.createElement("div");
-      divEvento.textContent = eventosDoDia[i].nome;
-      divEvento.classList.add("evento");
+    const weekStartDay = startOfWeek.getDate();
+    const weekEndDay = weekEndDate.getDate();
+    const weekStartMonth = startOfWeek.getMonth();
+    const weekEndMonth = weekEndDate.getMonth();
+    const weekStartYear = startOfWeek.getFullYear();
+    const weekEndYear = weekEndDate.getFullYear();
 
-      let duracao = eventosDoDia[i].fimIndex - eventosDoDia[i].inicioIndex + 1;
+    const eventoDataInicio = new Date(evento.data_inicio);
+    const eventoDataFim = new Date(evento.data_fim);
 
-      let totalEventos = eventosDoDia.length;
-      let espacoTotal = 10;
-      let espacoEntreEventos = 5;
-      let larguraDisponivel = 100 - espacoTotal;
-      let larguraPorEvento =
-        (larguraDisponivel - espacoEntreEventos * (totalEventos - 1)) /
-        totalEventos;
+    const eventoDentroDaSemana =
+      (eventoDataInicio >= startOfWeek && eventoDataInicio <= weekEndDate) ||
+      (eventoDataFim >= startOfWeek && eventoDataFim <= weekEndDate) ||
+      (eventoDataInicio <= startOfWeek && eventoDataFim >= weekEndDate);
 
-      let left = 5 + i * (larguraPorEvento + espacoEntreEventos);
+    const eventoIniciaNaSemana =
+      (eventoDataInicio.getFullYear() === weekStartYear &&
+        eventoDataInicio.getMonth() === weekStartMonth &&
+        eventoDataInicio.getDate() >= weekStartDay) ||
+      (eventoDataInicio.getFullYear() === weekEndYear &&
+        eventoDataInicio.getMonth() === weekEndMonth &&
+        eventoDataInicio.getDate() <= weekEndDay);
 
-      divEvento.style.height = `${duracao * 60}px`;
-      divEvento.style.marginTop = "5px";
-      divEvento.style.width = `${larguraPorEvento}%`;
-      divEvento.style.left = `${left}%`;
-      divEvento.style.top = "0";
-      divEvento.style.backgroundColor = `${eventosDoDia[i].cor}`;
+    if (eventoDentroDaSemana && eventoIniciaNaSemana) {
+      let inicioIndex = getHoraIndex(eventoData.inicioEvento);
+      let fimIndex = getHoraIndex(eventoData.fimEvento);
+      let chave = `${eventoData.dataInicioDia}`;
 
-      primeiraCelula.appendChild(divEvento);
+      if (!eventosAgrupados[chave]) {
+        eventosAgrupados[chave] = [];
+      }
+
+      eventosAgrupados[chave].push({ ...evento, inicioIndex, fimIndex });
     }
-  }
-});
+
+    let novoEventosAgrupados = {};
+
+    Object.keys(eventosAgrupados).forEach((chave) => {
+      let chaveSemZero = parseInt(chave, 10).toString();
+      novoEventosAgrupados[chaveSemZero] = eventosAgrupados[chave];
+    });
+
+    if (novoEventosAgrupados !== "") {
+      eventosAgrupados = novoEventosAgrupados;
+    }
+  });
+
+  Object.keys(eventosAgrupados).forEach((dia) => {
+    let eventosDoDia = eventosAgrupados[dia];
+    for (let i = 0; i < eventosDoDia.length; i++) {
+      let primeiraCelula = document.querySelector(
+        `td[data-hora="${
+          horarios[eventosDoDia[i].inicioIndex]
+        }"][data-dia="${dia}"]`
+      );
+
+      if (primeiraCelula) {
+        let divEvento = document.createElement("div");
+        divEvento.textContent = eventosDoDia[i].nome;
+        divEvento.classList.add("evento");
+
+        let duracao =
+          eventosDoDia[i].fimIndex - eventosDoDia[i].inicioIndex + 1;
+
+        let totalEventos = eventosDoDia.length;
+        let espacoTotal = 10;
+        let espacoEntreEventos = 5;
+        let larguraDisponivel = 100 - espacoTotal;
+        let larguraPorEvento =
+          (larguraDisponivel - espacoEntreEventos * (totalEventos - 1)) /
+          totalEventos;
+
+        let left = 5 + i * (larguraPorEvento + espacoEntreEventos);
+
+        divEvento.style.height = `${duracao * 60}px`;
+        divEvento.style.marginTop = "5px";
+        divEvento.style.width = `${larguraPorEvento}%`;
+        divEvento.style.left = `${left}%`;
+        divEvento.style.top = "0";
+        divEvento.style.backgroundColor = `${eventosDoDia[i].cor}`;
+
+        primeiraCelula.appendChild(divEvento);
+      }
+    }
+  });
+}
+
+updateWeekDates();
+marcarEventos();
