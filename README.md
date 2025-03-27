@@ -7,26 +7,52 @@ O objetivo deste desafio é entender como você estrutura seu código, suas habi
 ## Descrição
 - Desenvolva uma aplicação web utilizando HTML, JS e CSS para implementar o componente definido no [Figma](https://www.figma.com/design/imYbkhqGWDeSqTe7uYdhwH/Simplify-Tecnologia%3A-Desafio-T%C3%A9cnico---Desenvolvedor-Frontend-J%C3%BAnior?node-id=0-1&t=U33yR0AbOCMsNx8v-1).
 
-## Requisitos
-- Os dados dos eventos estarão no arquivo [eventos.json](eventos.json) que você deve consumir e exibir no calendário.
-- O layout deve seguir o design proposto no Figma.
-- A implementação deve ser feita usando apenas HTML, CSS e JavaScript puro, sem uso de frameworks (exemplo: React, Vue) ou bibliotecas de terceiros (exemplo: jQuery).
-- Não é necessário implementer a criação, atualização ou deleção de eventos.
+## Funcionalidades
+- Exibição dos eventos no calendário conforme o arquivo JSON.
+- Layout fiel ao design do Figma.
+- Responsividade
+- Efeitos de transição e animações suaves
+## Como Rodar o Projeto
 
-## Instruções
-- Fazer um fork do repositório para sua conta pessoal do GitHub.
-- Trabalhar utilizando commits.
-- Documentar como executar sua aplicação.
-- Ao finalizar, envie o link do seu repositório para contato@simplifytec.com.br.
+### Opção 1: Abrir diretamente no navegador
 
-## Diferenciais (não obrigatórios):
-- Responsividade para dispositivos móveis.
-- Animações sutis para melhorar a experiência do usuário.
-- Testes simples para validar a lógica do componente.
+1.Baixe ou clone o repositório:
 
-## O que será avaliado:
-✅ Organização e estrutura do código  
-✅ Clareza e simplicidade na solução  
-✅ Fidelidade visual ao layout do Figma  
-✅ Lógica e uso correto de JavaScript puro  
-✅ Atenção aos detalhes
+```js
+
+git clone https://github.com/jpcossi/desafio-frontend-jr.git
+
+```
+
+2. Acesse a pasta do projeto:
+
+```js
+
+cd desafio-frontend-jr
+
+```
+
+Abra o arquivo index.html no navegador:
+
+3. 
+- Clique duas vezes no arquivo index.html OU
+- No terminal, execute:
+
+```js
+
+start src/index.html   # Windows
+open src/index.html    # MacOS
+
+```
+
+
+### Opção 2: Usando um servidor local (recomendado)
+Como alguns navegadores bloqueiam a leitura de arquivos JSON em execução local (file://), é recomendado rodar o projeto em um servidor local:
+
+Inicializando com VS Code Live Server:
+
+1. Instale a extensão Live Server no VS Code.
+2. Clique com o botão direito no index.html e selecione "Open with Live Server".
+
+## Contato
+Em caso de dúvidas, entre em contato comigo através de jppcossi@gmail.com.
