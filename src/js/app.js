@@ -1,4 +1,8 @@
+import converterHora from "../utils/converterHora.js";
+import getHoraIndex from "../utils/getHoraIndex.js";
 import hexToRgba from "../utils/hexToRgba.js";
+import separarDiaHora from "../utils/separarHora.js";
+import getEvent from "../services/getEvents.js";
 
 const agendaBody = document.getElementById("agenda-body");
 const horarios = [
@@ -27,29 +31,36 @@ const horarios = [
   "10 PM",
   "11 PM",
 ];
-const eventos = await dataJSON();
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const eventos = await getEvent();
 
 let eventosAgrupados = {};
 
 let currentWeekStartDate = new Date();
+
 const startOfWeek = new Date(currentWeekStartDate);
 startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
 const endOfWeek = new Date(startOfWeek);
 endOfWeek.setDate(endOfWeek.getDate() + 6);
 
-async function dataJSON() {
-  try {
-    const response = await fetch("../../eventos.json");
-    if (!response.ok) {
-      throw new Error("Erro ao carregar o arquivo JSON");
-    }
-    const data = await response.json();
-
-    return data.eventos;
-  } catch (error) {
-    console.log("Erro:", error);
-  }
-}
+const table = document.querySelector("table");
+const timeBar = document.createElement("div");
+timeBar.classList.add("linha-horario");
+table.appendChild(timeBar);
 
 horarios.forEach((horario) => {
   let tr = document.createElement("tr");
@@ -75,8 +86,6 @@ horarios.forEach((horario) => {
 });
 
 function updateWeekDates() {
-  const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-
   const startOfWeek = new Date(currentWeekStartDate);
   const dayOfWeek = startOfWeek.getDay();
 
@@ -92,21 +101,6 @@ function updateWeekDates() {
 
     dayElement.textContent = currentDay.getDate();
     weekdayElement.textContent = daysOfWeek[i];
-
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
     monthElement.textContent = monthNames[currentDay.getMonth()];
   }
 
@@ -124,86 +118,6 @@ function updateWeekDates() {
   });
 }
 
-const agendaTable = document.getElementById("agenda-table");
-
-document.getElementById("next-week").addEventListener("click", () => {
-  document.getElementById("next-week").disabled = true;
-
-  table.classList.remove("table-right");
-  table.classList.add("table-left");
-
-  setTimeout(() => {
-    currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
-
-    destacarDiaAtual();
-    updateWeekDates();
-    marcarEventos();
-
-    table.classList.remove("table-left");
-    table.classList.add("table-right");
-  }, 400);
-
-  setTimeout(() => {
-    table.classList.remove("table-right");
-    document.getElementById("next-week").disabled = false;
-  }, 550);
-});
-
-document.getElementById("previous-week").addEventListener("click", () => {
-  document.getElementById("previous-week").disabled = true;
-
-  table.classList.remove("table-left");
-  table.classList.add("table-right");
-
-  setTimeout(() => {
-    currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
-
-    destacarDiaAtual();
-    updateWeekDates();
-    marcarEventos();
-
-    table.classList.remove("table-right");
-    table.classList.add("table-left");
-  }, 400);
-
-  setTimeout(() => {
-    table.classList.remove("table-left");
-    document.getElementById("previous-week").disabled = false;
-  }, 550);
-});
-
-function getHoraIndex(hora) {
-  return horarios.indexOf(hora);
-}
-
-function converterHora(time) {
-  const [hora, minutos] = time.split(":").map(Number);
-  const periodo = hora >= 12 ? "PM" : "AM";
-  const hora12 = hora % 12 || 12;
-  return `${hora12} ${periodo}`;
-}
-
-function separarDiaHora(dataInicio, dataFim) {
-  const [dataInicioData, dataInicioHora] = dataInicio.split("T");
-  const [dataFimData, dataFimHora] = dataFim.split("T");
-
-  const diaInicio = dataInicioData.split("-")[2];
-
-  const inicioEvento = converterHora(dataInicioHora);
-  const fimEvento = converterHora(dataFimHora);
-
-  return {
-    dataInicioDia: diaInicio,
-    inicioEvento,
-    fimEvento,
-  };
-}
-
-const table = document.querySelector("table");
-const timeBar = document.createElement("div");
-timeBar.classList.add("linha-horario");
-table.appendChild(timeBar);
-
 function updateTimeBar() {
   const hour = converterHora(
     startOfWeek.getHours() + ":" + startOfWeek.getMinutes()
@@ -213,14 +127,59 @@ function updateTimeBar() {
 
   if (startCell) {
     let cellPosition = startCell.getBoundingClientRect();
-    console.log(cellPosition);
     let topBar = cellPosition.top + (minutes / 60) * cellPosition.height - 128;
     timeBar.style.top = `${topBar + window.scrollY}px`;
     timeBar.style.left = `${cellPosition.left - 17}px`;
   }
 }
+function subscribeEvents() {
+  document.getElementById("next-week").addEventListener("click", () => {
+    document.getElementById("next-week").disabled = true;
 
-window.addEventListener("resize", updateTimeBar);
+    table.classList.remove("table-right");
+    table.classList.add("table-left");
+
+    setTimeout(() => {
+      currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
+
+      destacarDiaAtual();
+      updateWeekDates();
+      marcarEventos();
+
+      table.classList.remove("table-left");
+      table.classList.add("table-right");
+    }, 400);
+
+    setTimeout(() => {
+      table.classList.remove("table-right");
+      document.getElementById("next-week").disabled = false;
+    }, 550);
+  });
+
+  document.getElementById("previous-week").addEventListener("click", () => {
+    document.getElementById("previous-week").disabled = true;
+
+    table.classList.remove("table-left");
+    table.classList.add("table-right");
+
+    setTimeout(() => {
+      currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
+
+      destacarDiaAtual();
+      updateWeekDates();
+      marcarEventos();
+
+      table.classList.remove("table-right");
+      table.classList.add("table-left");
+    }, 400);
+
+    setTimeout(() => {
+      table.classList.remove("table-left");
+      document.getElementById("previous-week").disabled = false;
+    }, 550);
+  });
+  window.addEventListener("resize", updateTimeBar);
+}
 
 function marcarEventos() {
   document.querySelectorAll(".evento").forEach((evento) => evento.remove());
@@ -260,8 +219,8 @@ function marcarEventos() {
         eventoDataInicio.getDate() <= weekEndDay);
 
     if (eventoDentroDaSemana && eventoIniciaNaSemana) {
-      let inicioIndex = getHoraIndex(eventoData.inicioEvento);
-      let fimIndex = getHoraIndex(eventoData.fimEvento);
+      let inicioIndex = getHoraIndex(eventoData.inicioEvento, horarios);
+      let fimIndex = getHoraIndex(eventoData.fimEvento, horarios);
       let chave = `${eventoData.dataInicioDia}`;
 
       if (!eventosAgrupados[chave]) {
@@ -333,21 +292,26 @@ function marcarEventos() {
 }
 
 function destacarDiaAtual() {
-  const currentDay = new Date().getDate();
+  const day = new Date();
+  const currentDay = day.getDate();
 
   document.querySelectorAll("th").forEach((th) => {
     th.classList.remove("dia-atual");
   });
 
-  document.querySelectorAll("th .dia h1").forEach((h1) => {
-    if (parseInt(h1.textContent, 10) === currentDay) {
-      h1.parentElement.parentElement.classList.add("dia-atual");
+  document.querySelectorAll("th .dia h1").forEach((h1, index) => {
+    const month = document.getElementById(`dia${index + 1}-p`);
+    if (
+      parseInt(h1.textContent, 10) === currentDay &&
+      monthNames.indexOf(month.textContent) === day.getMonth()
+    ) {
+      h1.closest("th").classList.add("dia-atual");
     }
   });
 }
 
+subscribeEvents();
 updateWeekDates();
 marcarEventos();
 updateTimeBar();
 destacarDiaAtual();
-//setInterval(updateTimeBar(), 60000);
